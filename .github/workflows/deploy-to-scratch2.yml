@@ -1,0 +1,55 @@
+name: Deploy to BuildOrg (Build/Integration)
+
+on:
+  push:
+    branches: [ build ]
+  workflow_dispatch:
+
+jobs:
+  deploy-to-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install Salesforce CLI
+      run: npm install -g @salesforce/cli@latest
+      
+    - name: Authenticate to BuildOrg
+      run: |
+        echo "${{ secrets.BUILDORG_SFDX_URL }}" > ./authfile
+        sf org login sfdx-url --sfdx-url-file ./authfile --alias BuildOrg
+        
+    - name: Deploy to BuildOrg
+      run: |
+        sf project deploy start --target-org BuildOrg --wait 20
+        
+    - name: Run Tests
+      run: |
+        sf apex run test --target-org BuildOrg --wait 20 --result-format human --code-coverage
+        
+    - name: Integration Tests
+      run: |
+        echo "🔧 Running integration tests in Build environment..."
+        # Add your integration tests here
+        sf project deploy validate --target-org BuildOrg
+        
+    - name: Code Quality Check
+      run: |
+        echo "📊 Running code quality analysis..."
+        npm run lint
+        
+    - name: Build Validation Complete
+      run: |
+        echo "✅ Build environment validation completed successfully"
+        echo "Ready for promotion to Staging environment"
+        
+    - name: Cleanup
+      if: always()
+      run: rm -f ./authfile

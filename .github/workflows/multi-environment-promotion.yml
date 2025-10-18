@@ -1,0 +1,120 @@
+name: Multi-Environment Promotion Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      promotion_type:
+        description: 'Select promotion path'
+        required: true
+        type: choice
+        options:
+          - 'dev-to-build'
+          - 'build-to-staging'
+          - 'staging-to-production'
+          - 'full-pipeline'
+
+jobs:
+  promote-dev-to-build:
+    if: github.event.inputs.promotion_type == 'dev-to-build' || github.event.inputs.promotion_type == 'full-pipeline'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install Salesforce CLI
+      run: npm install -g @salesforce/cli@latest
+      
+    - name: Promote DevOrg to BuildOrg
+      run: |
+        echo "🔄 Promoting from DevOrg to BuildOrg..."
+        # Authenticate to both orgs
+        echo "${{ secrets.DEVORG_SFDX_URL }}" > ./devorg_auth
+        echo "${{ secrets.BUILDORG_SFDX_URL }}" > ./buildorg_auth
+        sf org login sfdx-url --sfdx-url-file ./devorg_auth --alias DevOrg
+        sf org login sfdx-url --sfdx-url-file ./buildorg_auth --alias BuildOrg
+        
+        # Deploy to BuildOrg
+        sf project deploy start --target-org BuildOrg --wait 20
+        sf apex run test --target-org BuildOrg --wait 20 --result-format human
+        
+        echo "✅ DevOrg → BuildOrg promotion completed"
+        
+    - name: Cleanup
+      if: always()
+      run: rm -f ./devorg_auth ./buildorg_auth
+
+  promote-build-to-staging:
+    if: github.event.inputs.promotion_type == 'build-to-staging' || github.event.inputs.promotion_type == 'full-pipeline'
+    needs: promote-dev-to-build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install Salesforce CLI
+      run: npm install -g @salesforce/cli@latest
+      
+    - name: Promote BuildOrg to StagingOrg
+      run: |
+        echo "🔄 Promoting from BuildOrg to StagingOrg..."
+        # Authenticate to both orgs
+        echo "${{ secrets.BUILDORG_SFDX_URL }}" > ./buildorg_auth
+        echo "${{ secrets.STAGINGORG_SFDX_URL }}" > ./stagingorg_auth
+        sf org login sfdx-url --sfdx-url-file ./buildorg_auth --alias BuildOrg
+        sf org login sfdx-url --sfdx-url-file ./stagingorg_auth --alias StagingOrg
+        
+        # Deploy to StagingOrg
+        sf project deploy start --target-org StagingOrg --wait 20
+        sf apex run test --target-org StagingOrg --wait 20 --result-format human
+        
+        echo "✅ BuildOrg → StagingOrg promotion completed"
+        
+    - name: Cleanup
+      if: always()
+      run: rm -f ./buildorg_auth ./stagingorg_auth
+
+  promote-staging-to-production:
+    if: github.event.inputs.promotion_type == 'staging-to-production' || github.event.inputs.promotion_type == 'full-pipeline'
+    needs: promote-build-to-staging
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install Salesforce CLI
+      run: npm install -g @salesforce/cli@latest
+      
+    - name: Promote StagingOrg to Production
+      run: |
+        echo "🔄 Promoting from StagingOrg to Production (MyNewDevHub)..."
+        # Authenticate to both orgs
+        echo "${{ secrets.STAGINGORG_SFDX_URL }}" > ./stagingorg_auth
+        echo "${{ secrets.DEVHUB_SFDX_URL }}" > ./devhub_auth
+        sf org login sfdx-url --sfdx-url-file ./stagingorg_auth --alias StagingOrg
+        sf org login sfdx-url --sfdx-url-file ./devhub_auth --alias MyNewDevHub
+        
+        # Deploy to Production
+        sf project deploy start --target-org MyNewDevHub --wait 30
+        sf apex run test --target-org MyNewDevHub --wait 30 --result-format human --code-coverage
+        
+        echo "✅ StagingOrg → Production promotion completed"
+        echo "🎉 Full pipeline deployment successful!"
+        
+    - name: Cleanup
+      if: always()
+      run: rm -f ./stagingorg_auth ./devhub_auth

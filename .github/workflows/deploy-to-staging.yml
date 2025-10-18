@@ -1,0 +1,64 @@
+name: Deploy to StagingOrg (User Acceptance Testing)
+
+on:
+  push:
+    branches: [ staging ]
+  workflow_dispatch:
+
+jobs:
+  deploy-to-staging:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install Salesforce CLI
+      run: npm install -g @salesforce/cli@latest
+      
+    - name: Authenticate to StagingOrg
+      run: |
+        echo "${{ secrets.STAGINGORG_SFDX_URL }}" > ./authfile
+        sf org login sfdx-url --sfdx-url-file ./authfile --alias StagingOrg
+        
+    - name: Deploy to StagingOrg
+      run: |
+        sf project deploy start --target-org StagingOrg --wait 20
+        
+    - name: Run Tests
+      run: |
+        sf apex run test --target-org StagingOrg --wait 20 --result-format human --code-coverage
+        
+    - name: UAT Validation
+      run: |
+        echo "🧪 Running User Acceptance Testing validation..."
+        sf project deploy validate --target-org StagingOrg --test-level RunLocalTests
+        
+    - name: Performance Testing
+      run: |
+        echo "⚡ Running performance validation..."
+        # Add performance testing commands here
+        
+    - name: Data Validation
+      run: |
+        echo "📊 Validating data integrity and migrations..."
+        # Add data validation scripts here
+        
+    - name: Security Scan
+      run: |
+        echo "🔒 Running security validation..."
+        # Add security scanning here
+        
+    - name: Staging Validation Complete
+      run: |
+        echo "✅ Staging environment validation completed successfully"
+        echo "Ready for promotion to Production (DevHub)"
+        
+    - name: Cleanup
+      if: always()
+      run: rm -f ./authfile

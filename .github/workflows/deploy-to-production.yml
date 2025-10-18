@@ -1,0 +1,85 @@
+name: Deploy to Production (MyNewDevHub)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      confirm_production:
+        description: 'Type "DEPLOY" to confirm production deployment'
+        required: true
+        type: string
+
+jobs:
+  deploy-to-production:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Validate Production Deployment Confirmation
+      if: github.event_name == 'workflow_dispatch'
+      run: |
+        if [ "${{ github.event.inputs.confirm_production }}" != "DEPLOY" ]; then
+          echo "❌ Production deployment cancelled. Must type 'DEPLOY' to confirm."
+          exit 1
+        fi
+        echo "✅ Production deployment confirmed"
+        
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install Salesforce CLI
+      run: npm install -g @salesforce/cli@latest
+      
+    - name: Authenticate to Production DevHub
+      run: |
+        echo "${{ secrets.DEVHUB_SFDX_URL }}" > ./authfile
+        sf org login sfdx-url --sfdx-url-file ./authfile --alias MyNewDevHub
+        
+    - name: Pre-Deployment Validation
+      run: |
+        echo "🔍 Running pre-deployment validation..."
+        sf project deploy validate --target-org MyNewDevHub --test-level RunLocalTests --wait 30
+        
+    - name: Create Deployment Backup Point
+      run: |
+        echo "💾 Creating deployment backup reference..."
+        echo "Deployment Time: $(date)" >> deployment-log.txt
+        echo "Commit: ${{ github.sha }}" >> deployment-log.txt
+        echo "Branch: ${{ github.ref_name }}" >> deployment-log.txt
+        
+    - name: Deploy to Production
+      run: |
+        echo "🚀 Deploying to Production DevHub..."
+        sf project deploy start --target-org MyNewDevHub --wait 30 --verbose
+        
+    - name: Run Production Tests
+      run: |
+        echo "🧪 Running production test suite..."
+        sf apex run test --target-org MyNewDevHub --wait 30 --result-format human --code-coverage
+        
+    - name: Post-Deployment Validation
+      run: |
+        echo "✅ Running post-deployment validation..."
+        sf org display --target-org MyNewDevHub
+        
+    - name: Production Deployment Complete
+      run: |
+        echo "🎉 Production deployment completed successfully!"
+        echo "DevHub environment updated with latest changes."
+        
+    - name: Notify Success
+      run: |
+        echo "📧 Production deployment notification:"
+        echo "- Environment: Production (MyNewDevHub)"
+        echo "- Commit: ${{ github.sha }}"
+        echo "- Deployed by: ${{ github.actor }}"
+        echo "- Status: SUCCESS ✅"
+        
+    - name: Cleanup
+      if: always()
+      run: rm -f ./authfile

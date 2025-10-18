@@ -1,0 +1,46 @@
+name: Deploy to DevOrg (Development)
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+  workflow_dispatch:
+
+jobs:
+  deploy-to-dev:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install Salesforce CLI
+      run: npm install -g @salesforce/cli@latest
+      
+    - name: Authenticate to DevOrg
+      run: |
+        echo "${{ secrets.DEVORG_SFDX_URL }}" > ./authfile
+        sf org login sfdx-url --sfdx-url-file ./authfile --alias DevOrg
+        
+    - name: Deploy to DevOrg
+      run: |
+        sf project deploy start --target-org DevOrg --wait 20
+        
+    - name: Run Tests
+      run: |
+        sf apex run test --target-org DevOrg --wait 20 --result-format human --code-coverage
+        
+    - name: Validate Deployment Success
+      run: |
+        echo "✅ Development deployment completed successfully"
+        echo "Ready for promotion to Build environment"
+        
+    - name: Cleanup
+      if: always()
+      run: rm -f ./authfile
