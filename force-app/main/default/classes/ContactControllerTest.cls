@@ -23,7 +23,7 @@ public class ContactControllerTest {
         
         System.assertNotEquals(null, contacts, 'Contacts list should not be null');
         System.assertEquals(3, contacts.size(), 'Should return 3 test contacts');
-        System.assertEquals('Test1', contacts[0].FirstName, 'First contact first name should match');
+        System.assertEquals('Test1 Contact1', contacts[0].Name, 'First contact name should match');
     }
     
     @isTest
