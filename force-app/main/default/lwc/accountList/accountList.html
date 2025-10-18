@@ -1,0 +1,70 @@
+<template>
+    <lightning-card title="Account Management" icon-name="standard:account">
+        <div class="slds-p-horizontal_medium">
+            <!-- New Account Button -->
+            <div class="slds-m-bottom_medium">
+                <lightning-button 
+                    label={showForm ? 'Cancel' : 'New Account'} 
+                    onclick={toggleForm}
+                    variant={showForm ? 'neutral' : 'brand'}>
+                </lightning-button>
+            </div>
+
+            <!-- New Account Form -->
+            <template if:true={showForm}>
+                <div class="slds-box slds-theme_default slds-m-bottom_medium">
+                    <h3 class="slds-text-heading_small slds-m-bottom_medium">Create New Account</h3>
+                    
+                    <lightning-input 
+                        label="Account Name" 
+                        value={accountName}
+                        data-field="name"
+                        onchange={handleInputChange}
+                        required>
+                    </lightning-input>
+                    
+                    <lightning-combobox 
+                        label="Account Type"
+                        value={accountType}
+                        options={typeOptions}
+                        data-field="type"
+                        onchange={handleInputChange}
+                        class="slds-m-top_small">
+                    </lightning-combobox>
+                    
+                    <div class="slds-m-top_medium">
+                        <lightning-button 
+                            label="Create Account" 
+                            onclick={handleCreateAccount}
+                            variant="brand">
+                        </lightning-button>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Account List -->
+            <template if:true={accounts}>
+                <lightning-datatable
+                    key-field="Id"
+                    data={accounts}
+                    columns={columns}
+                    hide-checkbox-column="true">
+                </lightning-datatable>
+            </template>
+
+            <!-- Error handling -->
+            <template if:true={error}>
+                <div class="slds-notify slds-notify_alert slds-theme_error">
+                    <h2>Error loading accounts: {error.body.message}</h2>
+                </div>
+            </template>
+
+            <!-- Loading state -->
+            <template if:false={accounts}>
+                <template if:false={error}>
+                    <lightning-spinner alternative-text="Loading accounts..."></lightning-spinner>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>
