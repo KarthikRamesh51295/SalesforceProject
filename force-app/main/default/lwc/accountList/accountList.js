@@ -88,7 +88,7 @@ export default class AccountList extends LightningElement {
             this.toggleForm();
             
             // Refresh the account list
-            return getAccounts();
+            await getAccounts();
         } catch (error) {
             this.showToast('Error', error.body.message, 'error');
         }
