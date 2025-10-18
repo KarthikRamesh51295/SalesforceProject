@@ -43,7 +43,7 @@ jobs:
     - name: Pre-Deployment Validation
       run: |
         echo "🔍 Running pre-deployment validation..."
-        sf project deploy validate --target-org MyNewDevHub --test-level RunLocalTests --wait 30
+        sf project deploy validate --source-dir force-app --target-org MyNewDevHub --test-level RunLocalTests --wait 30
         
     - name: Create Deployment Backup Point
       run: |
@@ -55,7 +55,7 @@ jobs:
     - name: Deploy to Production
       run: |
         echo "🚀 Deploying to Production DevHub..."
-        sf project deploy start --target-org MyNewDevHub --wait 30 --verbose
+        sf project deploy start --source-dir force-app --target-org MyNewDevHub --wait 30 --verbose
         
     - name: Run Production Tests
       run: |
