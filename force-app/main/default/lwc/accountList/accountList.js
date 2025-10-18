@@ -10,6 +10,15 @@ export default class AccountList extends LightningElement {
     accountName = '';
     accountType = 'Customer';
 
+    // Datatable columns configuration
+    columns = [
+        { label: 'Account Name', fieldName: 'Name', type: 'text' },
+        { label: 'Type', fieldName: 'Type', type: 'text' },
+        { label: 'Industry', fieldName: 'Industry', type: 'text' },
+        { label: 'Phone', fieldName: 'Phone', type: 'phone' },
+        { label: 'Website', fieldName: 'Website', type: 'url' }
+    ];
+
     // Account type options
     get typeOptions() {
         return [
@@ -18,6 +27,16 @@ export default class AccountList extends LightningElement {
             { label: 'Prospect', value: 'Prospect' },
             { label: 'Other', value: 'Other' }
         ];
+    }
+
+    // Button label computed property
+    get buttonLabel() {
+        return this.showForm ? 'Cancel' : 'New Account';
+    }
+
+    // Button variant computed property
+    get buttonVariant() {
+        return this.showForm ? 'neutral' : 'brand';
     }
 
     // Wire method to get accounts

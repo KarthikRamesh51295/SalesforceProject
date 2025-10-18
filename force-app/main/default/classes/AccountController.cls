@@ -28,6 +28,10 @@ public with sharing class AccountController {
     @AuraEnabled
     public static Id createAccount(String accountName, String accountType) {
         try {
+            if (String.isBlank(accountName)) {
+                throw new AuraHandledException('Account name is required');
+            }
+            
             Account newAccount = new Account(
                 Name = accountName,
                 Type = accountType
