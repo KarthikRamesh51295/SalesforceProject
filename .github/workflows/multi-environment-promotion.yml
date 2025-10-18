@@ -39,7 +39,7 @@ jobs:
         sf org login sfdx-url --sfdx-url-file ./buildorg_auth --alias BuildOrg
         
         # Deploy to BuildOrg
-        sf project deploy start --target-org BuildOrg --wait 20
+        sf project deploy start --source-dir force-app --target-org BuildOrg --wait 20
         sf apex run test --target-org BuildOrg --wait 20 --result-format human
         
         echo "✅ DevOrg → BuildOrg promotion completed"
@@ -74,7 +74,7 @@ jobs:
         sf org login sfdx-url --sfdx-url-file ./stagingorg_auth --alias StagingOrg
         
         # Deploy to StagingOrg
-        sf project deploy start --target-org StagingOrg --wait 20
+        sf project deploy start --source-dir force-app --target-org StagingOrg --wait 20
         sf apex run test --target-org StagingOrg --wait 20 --result-format human
         
         echo "✅ BuildOrg → StagingOrg promotion completed"
@@ -109,7 +109,7 @@ jobs:
         sf org login sfdx-url --sfdx-url-file ./devhub_auth --alias MyNewDevHub
         
         # Deploy to Production
-        sf project deploy start --target-org MyNewDevHub --wait 30
+        sf project deploy start --source-dir force-app --target-org MyNewDevHub --wait 30
         sf apex run test --target-org MyNewDevHub --wait 30 --result-format human --code-coverage
         
         echo "✅ StagingOrg → Production promotion completed"

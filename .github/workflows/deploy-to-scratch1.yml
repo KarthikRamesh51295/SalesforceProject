@@ -30,8 +30,7 @@ jobs:
         
     - name: Deploy to DevOrg
       run: |
-        sf project reset tracking --target-org DevOrg --no-prompt
-        sf project deploy start --target-org DevOrg --wait 20 --ignore-conflicts
+        sf project deploy start --source-dir force-app --target-org DevOrg --wait 20
         
     - name: Run Tests
       run: |

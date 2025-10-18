@@ -28,8 +28,7 @@ jobs:
         
     - name: Deploy to BuildOrg
       run: |
-        sf project reset tracking --target-org BuildOrg --no-prompt
-        sf project deploy start --target-org BuildOrg --wait 20 --ignore-conflicts
+        sf project deploy start --source-dir force-app --target-org BuildOrg --wait 20
         
     - name: Run Tests
       run: |
