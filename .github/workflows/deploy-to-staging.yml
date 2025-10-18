@@ -28,7 +28,8 @@ jobs:
         
     - name: Deploy to StagingOrg
       run: |
-        sf project deploy start --target-org StagingOrg --wait 20
+        sf project reset tracking --target-org StagingOrg --no-prompt
+        sf project deploy start --target-org StagingOrg --wait 20 --ignore-conflicts
         
     - name: Run Tests
       run: |
