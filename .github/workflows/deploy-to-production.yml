@@ -55,7 +55,7 @@ jobs:
     - name: Deploy to Production
       run: |
         echo "🚀 Deploying to Production DevHub..."
-        sf project deploy start --source-dir force-app --target-org MyNewDevHub --wait 30 --verbose
+        sf project deploy start --source-dir force-app --target-org MyNewDevHub --wait 30 --verbose --ignore-conflicts
         
     - name: Run Production Tests
       run: |

@@ -28,7 +28,7 @@ jobs:
         
     - name: Deploy to StagingOrg
       run: |
-        sf project deploy start --source-dir force-app --target-org StagingOrg --wait 20
+        sf project deploy start --source-dir force-app --target-org StagingOrg --wait 20 --ignore-conflicts
         
     - name: Run Tests
       run: |

@@ -28,7 +28,7 @@ jobs:
         
     - name: Deploy to BuildOrg
       run: |
-        sf project deploy start --source-dir force-app --target-org BuildOrg --wait 20
+        sf project deploy start --source-dir force-app --target-org BuildOrg --wait 20 --ignore-conflicts
         
     - name: Run Tests
       run: |
