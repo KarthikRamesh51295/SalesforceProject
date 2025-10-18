@@ -40,6 +40,11 @@ jobs:
         # Add your integration tests here
         sf project deploy validate --source-dir force-app --target-org BuildOrg
         
+    - name: Install Dependencies
+      run: |
+        echo "📦 Installing npm dependencies for linting..."
+        npm install
+        
     - name: Code Quality Check
       run: |
         echo "📊 Running code quality analysis..."
