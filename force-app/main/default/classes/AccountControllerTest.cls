@@ -55,11 +55,17 @@ public class AccountControllerTest {
     
     @isTest
     static void testGetAccountStatistics() {
+        // Get baseline counts before creating test data
+        Map<String, Integer> baselineStats = AccountController.getAccountStatistics();
+        Integer baselineTotal = baselineStats.get('totalAccounts') != null ? baselineStats.get('totalAccounts') : 0;
+        Integer baselineCustomer = baselineStats.get('CustomerAccounts') != null ? baselineStats.get('CustomerAccounts') : 0;
+        Integer baselineProspect = baselineStats.get('ProspectAccounts') != null ? baselineStats.get('ProspectAccounts') : 0;
+        
         // Create test data
         List<Account> testAccounts = new List<Account>{
-            new Account(Name = 'Customer Account 1', Type = 'Customer'),
-            new Account(Name = 'Customer Account 2', Type = 'Customer'),
-            new Account(Name = 'Prospect Account 1', Type = 'Prospect')
+            new Account(Name = 'Test Customer Account 1', Type = 'Customer'),
+            new Account(Name = 'Test Customer Account 2', Type = 'Customer'),
+            new Account(Name = 'Test Prospect Account 1', Type = 'Prospect')
         };
         insert testAccounts;
         
@@ -67,10 +73,10 @@ public class AccountControllerTest {
         Map<String, Integer> stats = AccountController.getAccountStatistics();
         Test.stopTest();
         
-        // Verify statistics
+        // Verify statistics - check for increases from baseline
         System.assertNotEquals(null, stats, 'Statistics should not be null');
-        System.assertEquals(3, stats.get('totalAccounts'), 'Total accounts should be 3');
-        System.assertEquals(2, stats.get('CustomerAccounts'), 'Customer accounts should be 2');
-        System.assertEquals(1, stats.get('ProspectAccounts'), 'Prospect accounts should be 1');
+        System.assertEquals(baselineTotal + 3, stats.get('totalAccounts'), 'Total accounts should increase by 3');
+        System.assertEquals(baselineCustomer + 2, stats.get('CustomerAccounts'), 'Customer accounts should increase by 2');
+        System.assertEquals(baselineProspect + 1, stats.get('ProspectAccounts'), 'Prospect accounts should increase by 1');
     }
 }
