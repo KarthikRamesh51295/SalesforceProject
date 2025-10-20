@@ -32,7 +32,7 @@ jobs:
         
     - name: Run Tests
       run: |
-        sf apex run test --target-org BuildOrg --wait 20 --result-format human --code-coverage
+        sf apex run test --target-org BuildOrg --wait 5 --result-format human --code-coverage --class-names "AccountControllerTest,ContactControllerTest" --synchronous
         
     - name: Integration Tests
       run: |

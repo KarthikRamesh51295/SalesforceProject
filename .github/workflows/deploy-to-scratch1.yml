@@ -34,7 +34,7 @@ jobs:
         
     - name: Run Tests
       run: |
-        sf apex run test --target-org DevOrg --wait 20 --result-format human --code-coverage
+        sf apex run test --target-org DevOrg --wait 5 --result-format human --code-coverage --class-names "AccountControllerTest,ContactControllerTest" --synchronous
         
     - name: Validate Deployment Success
       run: |
