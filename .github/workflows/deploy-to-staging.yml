@@ -32,27 +32,27 @@ jobs:
         
     - name: Run Tests
       run: |
-        echo "🧪 Running focused test suite for faster execution..."
+        echo "Running focused test suite for faster execution..."
         sf apex run test --target-org StagingOrg --wait 5 --result-format human --code-coverage --test-level RunSpecifiedTests --class-names AccountControllerTest,ContactControllerTest
         
     - name: UAT Validation
       run: |
-        echo "🧪 User Acceptance Testing validation completed with test execution above"
+        echo "User Acceptance Testing validation completed with test execution above"
         echo "✅ Skipping redundant test execution for faster pipeline"
         
     - name: Performance Testing
       run: |
-        echo "⚡ Running performance validation..."
+        echo "Running performance validation..."
         # Add performance testing commands here
         
     - name: Data Validation
       run: |
-        echo "📊 Validating data integrity and migrations..."
+        echo "Validating data integrity and migrations..."
         # Add data validation scripts here
         
     - name: Security Scan
       run: |
-        echo "🔒 Running security validation..."
+        echo "Running security validation..."
         # Add security scanning here
         
     - name: Staging Validation Complete

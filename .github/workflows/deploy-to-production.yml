@@ -42,39 +42,39 @@ jobs:
         
     - name: Pre-Deployment Validation
       run: |
-        echo "🔍 Running pre-deployment validation..."
+        echo "Running pre-deployment validation..."
         sf project deploy validate --source-dir force-app --target-org MyNewDevHub --test-level RunLocalTests --wait 30
         
     - name: Create Deployment Backup Point
       run: |
-        echo "💾 Creating deployment backup reference..."
+        echo "Creating deployment backup reference..."
         echo "Deployment Time: $(date)" >> deployment-log.txt
         echo "Commit: ${{ github.sha }}" >> deployment-log.txt
         echo "Branch: ${{ github.ref_name }}" >> deployment-log.txt
         
     - name: Deploy to Production
       run: |
-        echo "🚀 Deploying to Production DevHub..."
+        echo "Deploying to Production DevHub..."
         sf project deploy start --source-dir force-app --target-org MyNewDevHub --wait 30 --verbose --ignore-conflicts
         
     - name: Run Production Tests
       run: |
-        echo "🧪 Running production test suite..."
+        echo "Running production test suite..."
         sf apex run test --target-org MyNewDevHub --wait 30 --result-format human --code-coverage
         
     - name: Post-Deployment Validation
       run: |
-        echo "✅ Running post-deployment validation..."
+        echo "Running post-deployment validation..."
         sf org display --target-org MyNewDevHub
         
     - name: Production Deployment Complete
       run: |
-        echo "🎉 Production deployment completed successfully!"
+        echo "Production deployment completed successfully!"
         echo "DevHub environment updated with latest changes."
         
     - name: Notify Success
       run: |
-        echo "📧 Production deployment notification:"
+        echo "Production deployment notification:"
         echo "- Environment: Production (MyNewDevHub)"
         echo "- Commit: ${{ github.sha }}"
         echo "- Deployed by: ${{ github.actor }}"

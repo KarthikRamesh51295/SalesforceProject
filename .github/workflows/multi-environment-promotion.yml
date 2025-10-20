@@ -31,7 +31,7 @@ jobs:
       
     - name: Promote DevOrg to BuildOrg
       run: |
-        echo "🔄 Promoting from DevOrg to BuildOrg..."
+        echo "Promoting from DevOrg to BuildOrg..."
         # Authenticate to both orgs
         echo "${{ secrets.DEVORG_SFDX_URL }}" > ./devorg_auth
         echo "${{ secrets.BUILDORG_SFDX_URL }}" > ./buildorg_auth
@@ -66,7 +66,7 @@ jobs:
       
     - name: Promote BuildOrg to StagingOrg
       run: |
-        echo "🔄 Promoting from BuildOrg to StagingOrg..."
+        echo "Promoting from BuildOrg to StagingOrg..."
         # Authenticate to both orgs
         echo "${{ secrets.BUILDORG_SFDX_URL }}" > ./buildorg_auth
         echo "${{ secrets.STAGINGORG_SFDX_URL }}" > ./stagingorg_auth
@@ -101,7 +101,7 @@ jobs:
       
     - name: Promote StagingOrg to Production
       run: |
-        echo "🔄 Promoting from StagingOrg to Production (MyNewDevHub)..."
+        echo "Promoting from StagingOrg to Production (MyNewDevHub)..."
         # Authenticate to both orgs
         echo "${{ secrets.STAGINGORG_SFDX_URL }}" > ./stagingorg_auth
         echo "${{ secrets.DEVHUB_SFDX_URL }}" > ./devhub_auth
@@ -113,7 +113,7 @@ jobs:
         sf apex run test --target-org MyNewDevHub --wait 30 --result-format human --code-coverage
         
         echo "✅ StagingOrg → Production promotion completed"
-        echo "🎉 Full pipeline deployment successful!"
+        echo "Full pipeline deployment successful!"
         
     - name: Cleanup
       if: always()
