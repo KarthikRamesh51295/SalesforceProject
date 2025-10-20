@@ -52,4 +52,25 @@ public class AccountControllerTest {
         }
         Test.stopTest();
     }
+    
+    @isTest
+    static void testGetAccountStatistics() {
+        // Create test data
+        List<Account> testAccounts = new List<Account>{
+            new Account(Name = 'Customer Account 1', Type = 'Customer'),
+            new Account(Name = 'Customer Account 2', Type = 'Customer'),
+            new Account(Name = 'Prospect Account 1', Type = 'Prospect')
+        };
+        insert testAccounts;
+        
+        Test.startTest();
+        Map<String, Integer> stats = AccountController.getAccountStatistics();
+        Test.stopTest();
+        
+        // Verify statistics
+        System.assertNotEquals(null, stats, 'Statistics should not be null');
+        System.assertEquals(3, stats.get('totalAccounts'), 'Total accounts should be 3');
+        System.assertEquals(2, stats.get('CustomerAccounts'), 'Customer accounts should be 2');
+        System.assertEquals(1, stats.get('ProspectAccounts'), 'Prospect accounts should be 1');
+    }
 }
