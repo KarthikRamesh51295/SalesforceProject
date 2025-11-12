@@ -2,6 +2,7 @@ public with sharing class AccountController {
     /**
      * Get list of accounts for display
      * @return List of Account records
+     * Updated: Project rerun demonstration
      */
     @AuraEnabled(cacheable=true)
     public static List<Account> getAccounts() {
